@@ -1,0 +1,15 @@
+# Ignore compiled binaries
+bin/
+*.o
+*.out
+
+# Ignore log files
+logs/
+
+# Ignore editor-specific files
+.vscode/
+.idea/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
