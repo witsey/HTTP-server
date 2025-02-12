@@ -2,9 +2,40 @@
 #include <ws2tcpip.h> // additional IP-related functions for handeling IPv4 and IPv6
 #include <stdio.h> 
 #include <stdlib.h> // for memory management 
-#define PORT 8080
+#include <windows.h> // Windows API for implementing multi-threading
 
 #pragma comment(lib, "Ws2_32.lib") // Link against Winsock library
+
+#define PORT 8080
+
+
+DWORD WINAPI handle_client(PVOID client_socket_ptr) // WINAPI tells the windows that this function is a thread function.
+{
+    SOCKET client_socket = *(SOCKET*)client_socket_ptr;
+    free(client_socket_ptr);
+
+    printf("Client connected, handling request...\n");
+
+
+    Sleep(2000); // 5 seconds delay to test multithreading
+
+    char* response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, world!";
+    int bytes_sent = send(client_socket, response, strlen(response), 0);
+
+
+    // for debugging
+    if (bytes_sent == SOCKET_ERROR) 
+    {
+        printf("Send failed. Error Code: %d\n", WSAGetLastError());
+    } else {
+        printf("Response sent successfully (%d bytes).\n", bytes_sent);
+    }
+
+
+    closesocket(client_socket);
+    return 0;
+}
+
 
 
 int main() 
@@ -86,18 +117,28 @@ int main()
 
 
         if (client_socket == INVALID_SOCKET) {
+            printf("Accept failed. Error Code: %d\n", WSAGetLastError());
             printf("Accept failed.\n");
             continue;
         }
 
-        printf("Client connected!\n");
+        
+        SOCKET* client_socket_ptr = malloc(sizeof(SOCKET));
+        *client_socket_ptr = client_socket;
 
-        // send a basic HTTP response (just for testing)
-        char *response = "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, world!";
-        send(client_socket, response, strlen(response), 0);
+        HANDLE thread = CreateThread(NULL, 0, handle_client, client_socket_ptr, 0, NULL);
 
-        closesocket(client_socket); 
+
+        if (thread == NULL) 
+        {
+            printf("Failed to create thread.\n");
+            closesocket(client_socket);
+            free(client_socket_ptr);
+        } else {
+            CloseHandle(thread); // No need to keep track of the thread handle
+        }
     }
+
 
 
     // clean up
