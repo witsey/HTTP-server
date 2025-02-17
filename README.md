@@ -77,8 +77,9 @@ If working correctly, multiple requests will be processed **simultaneously**.
 🔹 **Thread Pool & Demultiplexing**: Optimize performance for concurrent requests.  
 
 ## Contribution  
-If you’d like to contribute:  
-1. **Fork the repo**  
-2. **Create a new branch**  
-3. **Submit a pull request**  
+If you’d like to contribute:
+1. ** check out the project roadmap on my notion page https://www.notion.so/HTTP-Server-Project-19d9ebfa16f8809eb893c548ff83956c?pvs=4 or simple read roadmap.md**
+2. **Fork the repo**  
+3. **Create a new branch**  
+4. **Submit a pull request**  
 
